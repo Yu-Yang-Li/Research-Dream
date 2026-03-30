@@ -136,24 +136,6 @@ metadata: {"openclaw":{"always":true,"skillKey":"research-dream"}}
 
 也就是说，后台周期性巩固默认不因单次新信号就立刻触发，而是参考原版 dream-skill 的思路，在“时间已到 + 会话已积累”后再进入一次真正的 consolidation。
 
-## 简化触发图
-
-```text
-日常对话
-   ↓
-前台增量更新
-   ↓
-检查是否到达深度整理条件
-   ├─ 距上次 deep dream 约 24h
-   └─ 且期间累计了若干次有意义科研会话（可参考 5+）
-   ↓
-若满足：执行一次 Research Dream
-   ↓
-定向理解 -> 收集信号 -> 合并巩固 -> 修剪索引
-   ↓
-刷新 .last-research-dream
-```
-
 ## Dream 流程感
 
 当进入一次较深的整理时，不要把它当成普通的文件编辑，而要把它当成一次“记忆做梦”：
