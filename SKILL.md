@@ -130,9 +130,29 @@ metadata: {"openclaw":{"always":true,"skillKey":"research-dream"}}
 默认可参考以下触发条件：
 
 - 距离上次深度整理约 `24h`
-- 或自上次深度整理后，新增了 `3+` 次有意义的会话
+- 且自上次深度整理后，累计了若干次有意义的科研会话（可参考 `5+` 次）
 
 如果工作区已有 heartbeat 或 cron 机制，优先利用它们来触发深度整理；没有的话，也可以在合适时机机会式执行。
+
+也就是说，后台周期性巩固默认不因单次新信号就立刻触发，而是参考原版 dream-skill 的思路，在“时间已到 + 会话已积累”后再进入一次真正的 consolidation。
+
+## 简化触发图
+
+```text
+日常对话
+   ↓
+前台增量更新
+   ↓
+检查是否到达深度整理条件
+   ├─ 距上次 deep dream 约 24h
+   └─ 且期间累计了若干次有意义科研会话（可参考 5+）
+   ↓
+若满足：执行一次 Research Dream
+   ↓
+定向理解 -> 收集信号 -> 合并巩固 -> 修剪索引
+   ↓
+刷新 .last-research-dream
+```
 
 ## Dream 流程感
 
@@ -205,7 +225,7 @@ metadata: {"openclaw":{"always":true,"skillKey":"research-dream"}}
 - `SOUL.md` 尽量短
 - `MEMORY.md` 只保留长期有价值内容
 
-深度整理完成后，在工作区根目录写入 `.last-research-dream`。
+深度整理完成后，在工作区根目录写入 `.last-research-dream`，用于记录最近一次 deep dream 的完成时间。
 
 如果这是一次真正的深度整理，那么它的目标不是“改一个字段”，而是：
 
@@ -267,7 +287,7 @@ metadata: {"openclaw":{"always":true,"skillKey":"research-dream"}}
 
 对 `认知风格`、`学术动机`、`人格特征`：
 
-- 绝不伪造正式量表维度策略结果
+- 绝不伪造正式维度结果
 - 必须明确区分：
   - `正式结果`
   - `AI推断`
@@ -298,14 +318,25 @@ metadata: {"openclaw":{"always":true,"skillKey":"research-dream"}}
 
 如果 heartbeat 发现整理需求已经明显超过“轻量更新”，可以把当前回合视为一次小型 Research Dream，并转入上面的深度整理流程。
 
+更接近原版 dream-skill 的做法是：
+
+- `heartbeat` 负责轻量检查与候选捕获
+- 深度整理只在满足“时间阈值 + 会话积累”时触发
+- `.last-research-dream` 只在真正完成一次深度整理后刷新，不因普通前台更新而刷新
+
 ## 完成标准
 
-每次有意义的更新或深度整理后，应满足：
+每次有意义的前台更新后，应满足：
 
 1. 新信号进入了正确层级
 2. `USER.md`、`SOUL.md`、`MEMORY.md` 只在必要时被更新
 3. 当日记忆在必要时被更新
-4. `.last-research-dream` 被写入或刷新
+
+每次真正完成一次深度整理后，额外应满足：
+
+1. 近期重复与过期内容已被修剪
+2. 长期层与短期层的分工仍然清晰
+3. `.last-research-dream` 被写入或刷新
 
 ## 对用户的隐性引导
 
